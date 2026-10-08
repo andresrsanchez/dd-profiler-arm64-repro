@@ -1,0 +1,15 @@
+ARG REPRO_IMAGE=dd-arm64-repro:net10
+FROM --platform=linux/arm64 mcr.microsoft.com/dotnet/sdk:10.0-alpine3.23 AS tools
+RUN dotnet tool install --tool-path /tools dotnet-sos && dotnet tool install --tool-path /tools dotnet-symbol && dotnet tool install --tool-path /tools dotnet-dump
+RUN /tools/dotnet-sos install --architecture Arm64 && cp -r /root/.dotnet/sos /sos
+
+FROM ${REPRO_IMAGE}
+RUN apk add --no-cache lldb gdb musl-dbg py3-lldb file binutils
+COPY --from=tools /tools /tools
+COPY --from=tools /sos /root/.dotnet/sos
+COPY --from=tools /usr/share/dotnet/sdk /usr/share/dotnet/sdk
+COPY symbols/symbols/linux-musl-arm64 /ddsym
+RUN printf 'plugin load /root/.dotnet/sos/libsosplugin.so\nsetsymbolserver -ms\n' > /root/.lldbinit
+ENV PATH=/tools:$PATH
+WORKDIR /dumps
+ENTRYPOINT ["/bin/sh"]

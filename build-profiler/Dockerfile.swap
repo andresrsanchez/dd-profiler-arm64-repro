@@ -1,0 +1,4 @@
+ARG BASE=dd-arm64-repro:net10
+FROM ${BASE}
+ARG SO
+COPY --chown=10000:10000 ${SO} /opt/datadog/apm/library/dotnet/linux-musl-arm64/Datadog.Profiler.Native.so

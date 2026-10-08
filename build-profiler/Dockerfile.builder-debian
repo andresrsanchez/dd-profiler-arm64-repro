@@ -1,0 +1,5 @@
+FROM debian:bookworm
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    clang-16 lld-16 gcc g++ cmake make git autoconf automake libtool python3 liblzma-dev ca-certificates curl pkg-config gdb \
+    && ln -s /usr/bin/clang-16 /usr/bin/clang && ln -s /usr/bin/clang++-16 /usr/bin/clang++ \
+    && rm -rf /var/lib/apt/lists/*
